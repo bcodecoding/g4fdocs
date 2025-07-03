@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>g4f (gpt4free) - Полное руководство</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #121218;
+            --card-bg-color: #1a1a22;
+            --primary-color: #4f46e5;
+            --primary-hover-color: #4338ca;
+            --text-color: #e2e8f0;
+            --text-muted-color: #94a3b8;
+            --border-color: #334155;
+            --code-bg-color: #282c34;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .content {
+            padding-top: 80px; /* Space for fixed nav */
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(18, 18, 24, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .nav a {
+            color: var(--text-muted-color);
+            text-decoration: none;
+            margin: 0 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--text-color);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        header h1 .highlight {
+            color: var(--primary-color);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-muted-color);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            background-color: var(--card-bg-color);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2.5rem;
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .section h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.8rem;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.75rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section h3 {
+            font-size: 1.4rem;
+            color: var(--text-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--primary-color);
+            padding-left: 1rem;
+        }
+        
+        .alert {
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+        
+        .alert-warning {
+            background-color: #4d3800;
+            border-color: #ffc107;
+            color: #fff3cd;
+        }
+        
+        .alert-info {
+            background-color: #0c3549;
+            border-color: #0dcaf0;
+            color: #cff4fc;
+        }
+
+        pre {
+            background-color: var(--code-bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #3a3f4c;
+            color: var(--text-muted-color);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            opacity: 1;
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        code:not(pre > code) {
+            background-color: var(--code-bg-color);
+            color: var(--text-color);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white !important;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: var(--primary-hover-color);
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            color: var(--text-muted-color);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        ul {
+            list-style-type: '✓ ';
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 0.75rem;
+        }
+        
+        @media (max-width: 768px) {
+            .nav a {
+                margin: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#intro">Введение</a>
+            <a href="#install">Установка</a>
+            <a href="#usage">Использование</a>
+            <a href="#providers">Провайдеры</a>
+            <a href="#advanced">Продвинутые техники</a>
+            <a href="#cli">CLI</a>
+        </div>
+    </nav>
+
+    <div class="container content">
+        <header>
+            <h1><span class="highlight">g4f</span>: Полное руководство</h1>
+            <p>Библиотека gpt4free для доступа к LLM и другим моделям ИИ через сторонние API.</p>
+        </header>
+
+        <main>
+            <section id="intro" class="section">
+                <h2>Что такое g4f?</h2>
+                <p><code>g4f</code> (gpt4free) — это Python-библиотека, которая предоставляет доступ к различным языковым моделям (LLM), таким как GPT-3.5, GPT-4, Llama и другим, используя обратную инженерию API различных веб-сайтов. Проект позволяет разработчикам и энтузиастам экспериментировать с современными моделями без необходимости покупать платный доступ.</p>
+                <div class="alert alert-warning">
+                    <strong>Важное предупреждение:</strong> Проект предназначен строго для <strong>образовательных целей</strong>. Использование <code>g4f</code> может быть нестабильным, так как зависит от сторонних сервисов, которые могут перестать работать в любой момент. Используйте на свой страх и риск.
+                </div>
+                <h3>Ключевые возможности</h3>
+                <ul>
+                    <li>Доступ к множеству бесплатных провайдеров API.</li>
+                    <li>Поддержка синхронного и асинхронного режимов.</li>
+                    <li>Стриминг ответов (получение ответа по частям).</li>
+                    <li>Генерация не только текста, но и изображений.</li>
+                    <li>Встроенный интерфейс командной строки (CLI) и GUI.</li>
+                    <li>Поддержка прокси для обхода ограничений.</li>
+                </ul>
+            </section>
+
+            <section id="install" class="section">
+                <h2>Установка</h2>
+                <h3>Стандартная установка через pip</h3>
+                <p>Самый простой способ установить библиотеку — использовать менеджер пакетов <code>pip</code>.</p>
+                <pre><code>pip install -U g4f</code><button class="copy-btn">Копировать</button></pre>
+                
+                <h3>Установка с дополнительными зависимостями</h3>
+                <p>Некоторые провайдеры требуют дополнительных библиотек (например, для решения капчи или работы с браузером). Вы можете установить их все одной командой:</p>
+                <pre><code>pip install -U g4f[all]</code><button class="copy-btn">Копировать</button></pre>
+
+                <h3>Установка последней версии с GitHub</h3>
+                <p>Для доступа к самым свежим изменениям и провайдерам, которых еще нет в PyPI, можно установить библиотеку напрямую из репозитория.</p>
+                <pre><code>pip install -U git+https://github.com/xtekky/gpt4free</code><button class="copy-btn">Копировать</button></pre>
+            </section>
+
+            <section id="usage" class="section">
+                <h2>Основы использования</h2>
+                <p>Работать с библиотекой очень просто. Вот основные примеры.</p>
+
+                <h3>Простой чат (синхронный режим)</h3>
+                <p>Это базовый пример, который отправляет запрос и ждет полного ответа.</p>
+                <pre><code class="language-python">
+import g4f
+
+response = g4f.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": "Напиши приветствие для документации."}],
+)
+
+print(response)
+                </code><button class="copy-btn">Копировать</button></pre>
+
+                <h3>Стриминг ответа (потоковая передача)</h3>
+                <p>Этот метод позволяет получать ответ по частям, как в ChatGPT, что полезно для интерактивных приложений.</p>
+                <pre><code class="language-python">
+import g4f
+
+response = g4f.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": "Расскажи анекдот."}],
+    stream=True
+)
+
+for message in response:
+    print(message, end="", flush=True)
+
+print()
+                </code><button class="copy-btn">Копировать</button></pre>
+            </section>
+            
+            <section id="providers" class="section">
+                <h2>Провайдеры и Модели</h2>
+                <p><code>g4f</code> не хостит модели самостоятельно. Вместо этого он использует "провайдеров" — сторонние сайты, которые предоставляют доступ к моделям. Это его главная сила и слабость.</p>
+                
+                <h3>Явное указание провайдера</h3>
+                <p>Вы можете выбрать конкретного провайдера. Это полезно, если вы знаете, какой из них работает стабильно.</p>
+                <pre><code class="language-python">
+import g4f
+
+response = g4f.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    provider=g4f.Provider.GptGo, # Указываем провайдера
+    messages=[{"role": "user", "content": "Привет, как дела?"}],
+)
+print(response)
+                </code><button class="copy-btn">Копировать</button></pre>
+                
+                <h3>Как посмотреть список доступных провайдеров?</h3>
+                <p>Вы можете получить список всех провайдеров, которые встроены в библиотеку.</p>
+                 <pre><code class="language-python">
+import g4f
+
+for provider in g4f.Provider.__all__:
+    if provider.supports_gpt_3_5_turbo:
+        print(provider.__name__)
+                </code><button class="copy-btn">Копировать</button></pre>
+                <div class="alert alert-info">
+                    <strong>Совет:</strong> Провайдеры часто выходят из строя. Рекомендуется использовать асинхронный режим, который автоматически перебирает несколько провайдеров, если один не отвечает. Если ничего не работает, попробуйте обновить библиотеку до последней версии с GitHub.
+                </div>
+            </section>
+            
+            <section id="advanced" class="section">
+                <h2>Продвинутые техники</h2>
+                <h3>Асинхронный режим</h3>
+                <p>Асинхронность — предпочтительный способ использования <code>g4f</code>. Он позволяет делать запросы к нескольким провайдерам одновременно, что значительно повышает шансы на получение ответа.</p>
+                <pre><code class="language-python">
+import asyncio
+import g4f
+
+async def main():
+    response = await g4f.ChatCompletion.create_async(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": "Что такое асинхронность?"}],
+    )
+    print(response)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+                </code><button class="copy-btn">Копировать</button></pre>
+                
+                <h3>Генерация изображений</h3>
+                <p>Некоторые провайдеры поддерживают генерацию изображений.</p>
+                <pre><code class="language-python">
+import g4f
+
+response = g4f.Image.create(
+    prompt="A white cat flying in space",
+    provider=g4f.Provider.Bing, # Bing (Copilot Designer) часто используется для этого
+)
+print(response) # вернет список URL-адресов изображений
+                </code><button class="copy-btn">Копировать</button></pre>
+                
+                <h3>Использование прокси</h3>
+                <p>Если провайдер заблокирован в вашей стране или блокирует ваш IP, вы можете использовать прокси.</p>
+                <pre><code class="language-python">
+response = g4f.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": "Test"}],
+    proxies={"http": "http://user:pass@host:port"} # или https
+)
+                </code><button class="copy-btn">Копировать</button></pre>
+            </section>
+            
+            <section id="cli" class="section">
+                <h2>Интерфейс командной строки (CLI)</h2>
+                <p><code>g4f</code> поставляется с удобным инструментом для использования прямо из терминала.</p>
+
+                <h3>Простой запрос в чат</h3>
+                <pre><code>g4f chat "Что такое Python?"</code><button class="copy-btn">Копировать</button></pre>
+
+                <h3>Запуск графического интерфейса (GUI)</h3>
+                <p>Вы можете запустить локальное веб-приложение для удобного общения с моделями.</p>
+                <pre><code>g4f gui</code><button class="copy-btn">Копировать</button></pre>
+                <p>После запуска откройте браузер по адресу <a href="http://127.0.0.1:8080">http://127.0.0.1:8080</a>.</p>
+            </section>
+
+        </main>
+
+        <footer>
+            <div style="margin-bottom: 1rem;">
+                <a href="https://github.com/xtekky/gpt4free" target="_blank" class="button">GitHub репозиторий</a>
+                <a href="https://pypi.org/project/g4f/" target="_blank" class="button">Страница на PyPI</a>
+            </div>
+            <p>Этот документ является неофициальным руководством. Вся информация взята из общедоступных источников.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Плавная прокрутка ---
+            document.querySelectorAll('.nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                         window.scrollTo({
+                            top: targetElement.offsetTop - 80, // offset for fixed nav
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // --- Анимация секций при прокрутке ---
+            const sections = document.querySelectorAll('.section');
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(section => observer.observe(section));
+
+            // --- Кнопка "Копировать" для кода ---
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const pre = button.parentElement;
+                    const code = pre.querySelector('code');
+                    const text = code.innerText;
+                    
+                    navigator.clipboard.writeText(text).then(() => {
+                        button.innerText = 'Скопировано!';
+                        setTimeout(() => {
+                            button.innerText = 'Копировать';
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                });
+            });
+            
+            // --- Активная ссылка в навигации при прокрутке ---
+            const navLinks = document.querySelectorAll('.nav a');
+            const sectionObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                           link.classList.remove('active');
+                           if(link.getAttribute('href') === `#${entry.target.id}`) {
+                               link.classList.add('active');
+                           }
+                        });
+                    }
+                });
+            }, { rootMargin: "-30% 0px -70% 0px" });
+            
+            document.querySelectorAll('section').forEach(sec => sectionObserver.observe(sec));
+        });
+    </script>
+</body>
+</html>
